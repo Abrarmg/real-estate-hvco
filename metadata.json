@@ -1,0 +1,6 @@
+{
+  "name": "The Real Estate Lead Leakage Audit™",
+  "description": "Interactive diagnostic audit tool for US real estate agents buying paid leads on Zillow, Facebook Ads, Google Ads, and Realtor.com to calculate their Lead Leakage Score and recover missed appointments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

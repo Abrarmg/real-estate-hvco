@@ -4,7 +4,8 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.resolve(__dirname, '../../audits.db');
+const isVercel = process.env.VERCEL === '1';
+const dbPath = isVercel ? '/tmp/audits.db' : path.resolve(__dirname, '../../audits.db');
 
 export const db = new Database(dbPath);
 

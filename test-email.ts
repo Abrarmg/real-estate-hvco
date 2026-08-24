@@ -1,40 +1,62 @@
-import * as dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { render } from '@react-email/render';
+import React from 'react';
+import fs from 'fs';
+import InternalLeadEmail from './src/emails/InternalLeadEmail';
+import ProspectReportEmail from './src/emails/ProspectReportEmail';
 
-// Load .env explicitly FIRST
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+const mockAudit = {
+  id: 'test-123',
+  firstName: 'John',
+  email: 'john@example.com',
+  phone: '555-1234',
+  websiteOrBrokerage: 'John Real Estate',
+  crmPlatform: 'HubSpot',
+  scores: {
+    overallScore: 75,
+    speedToLead: 15,
+    followUp: 20,
+    qualification: 10,
+    appointmentFlow: 15,
+    reactivation: 15
+  },
+  diagnosis: 'Line 1\nLine 2',
+  answers: { "Q1": "A1" }
+};
 
-import { Resend } from 'resend';
+const reportUrl = 'https://example.com/report';
+const bookingUrl = 'https://example.com/book';
 
-async function testResend() {
-  console.log('RESEND_API_KEY loaded:', !!process.env.RESEND_API_KEY ? 'YES' : 'NO');
-  console.log('RESEND_FROM_EMAIL loaded:', !!process.env.RESEND_FROM_EMAIL ? 'YES' : 'NO', process.env.RESEND_FROM_EMAIL);
-  console.log('LEAD_NOTIFICATION_EMAIL loaded:', !!process.env.LEAD_NOTIFICATION_EMAIL ? 'YES' : 'NO');
-  console.log('REPLY_TO_EMAIL loaded:', !!process.env.REPLY_TO_EMAIL ? 'YES' : 'NO');
-  console.log('APP_URL loaded:', !!process.env.APP_URL ? 'YES' : 'NO');
-  console.log('BOOKING_URL loaded:', !!process.env.BOOKING_URL ? 'YES' : 'NO');
-  console.log('EMAILS_ENABLED value:', process.env.EMAILS_ENABLED === 'true' ? 'enabled' : 'disabled');
-  console.log('EMAIL_TEST_RECIPIENT loaded:', !!process.env.EMAIL_TEST_RECIPIENT ? 'YES' : 'NO');
+async function main() {
+  const internalHtml = await render(
+    React.createElement(InternalLeadEmail, {
+      auditId: mockAudit.id,
+      contact: {
+        firstName: mockAudit.firstName,
+        email: mockAudit.email,
+        phone: mockAudit.phone,
+        websiteOrBrokerage: mockAudit.websiteOrBrokerage,
+        crmPlatform: mockAudit.crmPlatform,
+      },
+      scores: mockAudit.scores,
+      diagnosis: mockAudit.diagnosis,
+      answers: mockAudit.answers,
+      reportUrl,
+    })
+  );
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const prospectHtml = await render(
+    React.createElement(ProspectReportEmail, {
+      contact: { firstName: mockAudit.firstName },
+      scores: mockAudit.scores,
+      diagnosis: mockAudit.diagnosis,
+      reportUrl,
+      bookingUrl,
+    })
+  );
 
-  const { data, error } = await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || 'reports@abrar.gotautomated.com',
-    to: process.env.EMAIL_TEST_RECIPIENT || process.env.LEAD_NOTIFICATION_EMAIL || 'ibrarsargana7840@gmail.com',
-    subject: 'Resend Connection Test',
-    html: '<h1>Resend works</h1><p>This email was sent directly from the server.</p>'
-  });
-
-  if (error) {
-    console.error('RESEND DIRECT TEST: FAILED');
-    console.error('Error message:', error.message);
-    console.error('Error name:', error.name);
-  } else {
-    console.log('RESEND DIRECT TEST: SUCCESS');
-    console.log('Resend Email ID:', data?.id);
-  }
+  fs.writeFileSync('/tmp/internal1.html', internalHtml);
+  fs.writeFileSync('/tmp/prospect1.html', prospectHtml);
+  console.log('Saved baseline HTML');
 }
 
-testResend();
+main().catch(console.error);

@@ -1,39 +1,16 @@
-import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
-let dbPath = '/tmp/audits.db';
+let dbPath = '/tmp/audits.json';
 if (process.env.VERCEL !== '1') {
   try {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    dbPath = path.resolve(__dirname, '../../audits.db');
+    dbPath = path.resolve(__dirname, '../../audits.json');
   } catch (e) {
-    dbPath = path.resolve(process.cwd(), 'audits.db');
+    dbPath = path.resolve(process.cwd(), 'audits.json');
   }
 }
-export const db = new Database(dbPath);
-
-// Initialize table
-db.exec(`
-  CREATE TABLE IF NOT EXISTS audits (
-    id TEXT PRIMARY KEY,
-    firstName TEXT,
-    email TEXT,
-    phone TEXT,
-    websiteOrBrokerage TEXT,
-    crmPlatform TEXT,
-    overallScore INTEGER,
-    scores JSON,
-    answers JSON,
-    diagnosis TEXT,
-    internal_email_status TEXT DEFAULT 'pending',
-    internal_resend_id TEXT,
-    prospect_email_status TEXT DEFAULT 'pending',
-    prospect_resend_id TEXT,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
 
 export interface SavedAudit {
   id: string;
@@ -53,49 +30,35 @@ export interface SavedAudit {
   createdAt: string;
 }
 
+function readDB(): Record<string, SavedAudit> {
+  if (!fs.existsSync(dbPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+  } catch {
+    return {};
+  }
+}
+
+function writeDB(data: Record<string, SavedAudit>) {
+  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
 export function saveAudit(audit: Partial<SavedAudit>) {
-  const stmt = db.prepare(`
-    INSERT INTO audits (
-      id, firstName, email, phone, websiteOrBrokerage, crmPlatform,
-      overallScore, scores, answers, diagnosis
-    ) VALUES (
-      @id, @firstName, @email, @phone, @websiteOrBrokerage, @crmPlatform,
-      @overallScore, @scores, @answers, @diagnosis
-    )
-  `);
-  
-  stmt.run({
-    id: audit.id,
-    firstName: audit.firstName,
-    email: audit.email,
-    phone: audit.phone || null,
-    websiteOrBrokerage: audit.websiteOrBrokerage || null,
-    crmPlatform: audit.crmPlatform || null,
-    overallScore: audit.overallScore,
-    scores: JSON.stringify(audit.scores),
-    answers: JSON.stringify(audit.answers),
-    diagnosis: audit.diagnosis
-  });
+  const data = readDB();
+  data[audit.id!] = audit as SavedAudit;
+  writeDB(data);
 }
 
 export function updateEmailStatus(id: string, type: 'internal' | 'prospect', status: string, resendId?: string) {
-  const stmt = db.prepare(`
-    UPDATE audits 
-    SET ${type}_email_status = @status,
-        ${type}_resend_id = @resendId
-    WHERE id = @id
-  `);
-  stmt.run({ id, status, resendId: resendId || null });
+  const data = readDB();
+  if (data[id]) {
+    (data[id] as any)[`${type}_email_status`] = status;
+    if (resendId) (data[id] as any)[`${type}_resend_id`] = resendId;
+    writeDB(data);
+  }
 }
 
 export function getAuditById(id: string): SavedAudit | undefined {
-  const stmt = db.prepare('SELECT * FROM audits WHERE id = ?');
-  const row = stmt.get(id) as any;
-  if (!row) return undefined;
-  
-  return {
-    ...row,
-    scores: JSON.parse(row.scores),
-    answers: JSON.parse(row.answers)
-  };
+  const data = readDB();
+  return data[id];
 }

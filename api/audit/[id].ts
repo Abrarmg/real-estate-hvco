@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { getAuditById } from '../../src/lib/db.js';
+import { getAuditById } from '../../src/lib/db';
 
 export default function handler(req: Request, res: Response) {
   if (req.method !== 'GET') {

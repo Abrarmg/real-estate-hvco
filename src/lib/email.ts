@@ -71,15 +71,15 @@ export async function sendAuditEmails(audit: SavedAudit) {
     });
 
     if (internalData.error) {
-      console.error('[EMAIL DEBUG] internal result FAILED', internalData.error);
-      updateEmailStatus(audit.id, 'internal', 'failed');
+      console.error('INTERNAL EMAIL FAILED:', internalData.error);
+      await updateEmailStatus(audit.id, 'internal', 'failed');
     } else {
-      console.log('[EMAIL DEBUG] internal result SUCCESS', internalData.data?.id);
-      updateEmailStatus(audit.id, 'internal', 'sent', internalData.data?.id);
+      console.log('INTERNAL EMAIL SUCCESS:', internalData.data?.id);
+      await updateEmailStatus(audit.id, 'internal', 'delivered', internalData.data?.id);
     }
   } catch (err) {
-    console.error('Error in sendInternalEmail:', err);
-    updateEmailStatus(audit.id, 'internal', 'failed');
+    console.error('INTERNAL EMAIL CATCH FAILED:', err);
+    await updateEmailStatus(audit.id, 'internal', 'failed');
   }
 
   // 2. Send Prospect Report Email
@@ -119,14 +119,14 @@ export async function sendAuditEmails(audit: SavedAudit) {
 
     if (prospectData.error) {
       console.error('[EMAIL DEBUG] prospect result FAILED', prospectData.error);
-      updateEmailStatus(audit.id, 'prospect', 'failed');
+      await updateEmailStatus(audit.id, 'prospect', 'failed');
     } else {
       console.log('[EMAIL DEBUG] prospect result SUCCESS', prospectData.data?.id);
-      updateEmailStatus(audit.id, 'prospect', 'sent', prospectData.data?.id);
+      await updateEmailStatus(audit.id, 'prospect', 'sent', prospectData.data?.id);
     }
   } catch (err) {
     console.error('Error in sendProspectEmail:', err);
-    updateEmailStatus(audit.id, 'prospect', 'failed');
+    await updateEmailStatus(audit.id, 'prospect', 'failed');
   }
   
   console.log('[EMAIL DEBUG] email flow complete');

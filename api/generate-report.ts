@@ -154,7 +154,7 @@ export default async function handler(req: Request, res: Response) {
       diagnosis: writerContent,
     };
 
-    saveAudit(savedAudit);
+    await saveAudit(savedAudit);
     console.log(`[EMAIL DEBUG] audit saved: ${auditId}`);
 
     console.log('[EMAIL DEBUG] attempting email send');

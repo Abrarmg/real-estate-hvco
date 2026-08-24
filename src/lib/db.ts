@@ -1,15 +1,9 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
 import fs from 'fs';
 
 let dbPath = '/tmp/audits.json';
 if (process.env.VERCEL !== '1') {
-  try {
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    dbPath = path.resolve(__dirname, '../../audits.json');
-  } catch (e) {
-    dbPath = path.resolve(process.cwd(), 'audits.json');
-  }
+  dbPath = path.resolve(process.cwd(), 'audits.json');
 }
 
 export interface SavedAudit {

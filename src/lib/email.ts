@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
-import React from 'react';
+import * as React from 'react';
 import InternalLeadEmail from '../emails/InternalLeadEmail.js';
 import ProspectReportEmail from '../emails/ProspectReportEmail.js';
 import { SavedAudit, updateEmailStatus } from './db.js';

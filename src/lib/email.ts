@@ -6,7 +6,7 @@ import ProspectReportEmail from '../emails/ProspectReportEmail.js';
 import { SavedAudit, updateEmailStatus } from './db.js';
 
 export async function sendAuditEmails(audit: SavedAudit) {
-  const EMAILS_ENABLED = process.env.EMAILS_ENABLED === 'true';
+  const EMAILS_ENABLED = String(process.env.EMAILS_ENABLED).toLowerCase() === 'true';
   const resend = new Resend(process.env.RESEND_API_KEY || 'dummy_key');
   const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Lead Audit <reports@yourdomain.com>';
   const NOTIFICATION_EMAIL = process.env.LEAD_NOTIFICATION_EMAIL || 'owner@example.com';

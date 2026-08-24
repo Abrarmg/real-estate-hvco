@@ -3,10 +3,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const isVercel = process.env.VERCEL === '1';
-const dbPath = isVercel ? '/tmp/audits.db' : path.resolve(__dirname, '../../audits.db');
-
+let dbPath = '/tmp/audits.db';
+if (process.env.VERCEL !== '1') {
+  try {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    dbPath = path.resolve(__dirname, '../../audits.db');
+  } catch (e) {
+    dbPath = path.resolve(process.cwd(), 'audits.db');
+  }
+}
 export const db = new Database(dbPath);
 
 // Initialize table

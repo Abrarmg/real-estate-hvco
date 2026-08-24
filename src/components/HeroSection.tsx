@@ -189,8 +189,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuditModal }) =>
           >
             {/* Centered two-line text */}
             <div className="flex-1 text-center font-black text-base xs:text-lg sm:text-xl leading-tight">
-              <div>Reveal My Lead Leakage</div>
-              <div>Score</div>
+              <div>Start Lead Audit Now</div>
             </div>
 
             {/* Right arrow icon */}

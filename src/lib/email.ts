@@ -72,7 +72,7 @@ export async function sendAuditEmails(audit: SavedAudit) {
 
     if (internalData.error) {
       console.error('INTERNAL EMAIL FAILED:', internalData.error);
-      await updateEmailStatus(audit.id, 'internal', 'failed');
+      await updateEmailStatus(audit.id, 'internal', `failed: ${internalData.error.message}`);
     } else {
       console.log('INTERNAL EMAIL SUCCESS:', internalData.data?.id);
       await updateEmailStatus(audit.id, 'internal', 'delivered', internalData.data?.id);
@@ -119,7 +119,7 @@ export async function sendAuditEmails(audit: SavedAudit) {
 
     if (prospectData.error) {
       console.error('[EMAIL DEBUG] prospect result FAILED', prospectData.error);
-      await updateEmailStatus(audit.id, 'prospect', 'failed');
+      await updateEmailStatus(audit.id, 'prospect', `failed: ${prospectData.error.message}`);
     } else {
       console.log('[EMAIL DEBUG] prospect result SUCCESS', prospectData.data?.id);
       await updateEmailStatus(audit.id, 'prospect', 'sent', prospectData.data?.id);

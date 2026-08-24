@@ -172,8 +172,12 @@ export default async function handler(req: Request, res: Response) {
 
     // Wrap in JSON and return the ID so the frontend knows its secure identifier
     res.json({ diagnosis: writerContent, auditId });
-  } catch (error) {
+  } catch (error: any) {
     console.error("OpenAI Generation Error:", error);
-    res.status(500).json({ error: "Failed to generate AI report" });
+    res.status(500).json({ 
+      error: "Failed to generate AI report",
+      details: error.message || error.toString(),
+      stack: error.stack
+    });
   }
 }

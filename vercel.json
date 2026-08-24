@@ -2,15 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/generate-report.ts": {
-      "includeFiles": [
-        "src/emails/**",
-        "src/lib/**"
-      ]
-    },
-    "api/audit/[id].ts": {
-      "includeFiles": [
-        "src/lib/**"
-      ]
+      "includeFiles": "src/**/*"
     }
   }
 }

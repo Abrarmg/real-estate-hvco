@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 import OpenAI from 'openai';
 import { v4 as uuidv4 } from 'uuid';
-import { saveAudit } from '../src/lib/db';
-import { sendAuditEmails } from '../src/lib/email';
+import { saveAudit } from '../src/lib/db.js';
+import { sendAuditEmails } from '../src/lib/email.js';
 
 const DIAGNOSTIC_SYSTEM_PROMPT = `
 You are the Diagnostic Engine for a real estate lead leakage system.

@@ -1,9 +1,9 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
 import * as React from 'react';
-import InternalLeadEmail from '../emails/InternalLeadEmail';
-import ProspectReportEmail from '../emails/ProspectReportEmail';
-import { SavedAudit, updateEmailStatus } from './db';
+import InternalLeadEmail from '../emails/InternalLeadEmail.js';
+import ProspectReportEmail from '../emails/ProspectReportEmail.js';
+import { SavedAudit, updateEmailStatus } from './db.js';
 
 export async function sendAuditEmails(audit: SavedAudit) {
   const EMAILS_ENABLED = process.env.EMAILS_ENABLED === 'true';
